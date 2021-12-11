@@ -1,9 +1,22 @@
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.action.disable();
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => { var tab = await chrome.tabs.get(tabId);	if (tab.active && changeInfo.url) {
-  const tab = await chrome.tabs.get(info.tabId);
-    
-    const isGithub = tab.url.startsWith('https://math-ege');
-    isGithub 
-      ? chrome.action.enable(tab.tabId) 
-      : chrome.action.disable(tab.tabId);
-} });
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    // Declare a rule to enable the action on example.com pages
+    let exampleRule = {
+      conditions: [
+        new chrome.declarativeContent.PageStateMatcher({
+          pageUrl: {urlContains: 'sdamgia.ru/test?'}
+        })
+      ],
+      actions: [new chrome.declarativeContent.ShowAction()],
+    };
+
+    // Finally, apply our new array of rules
+    let rules = [exampleRule];
+    chrome.declarativeContent.onPageChanged.addRules(rules);
+
+  });
+
+});
+

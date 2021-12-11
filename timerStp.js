@@ -1,0 +1,1 @@
+﻿clearTimeout(window.ticker);

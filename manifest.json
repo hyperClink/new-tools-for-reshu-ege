@@ -6,7 +6,8 @@
 
   "permissions": [
           "activeTab",
-          "declarativeContent"
+          "declarativeContent",
+          "scripting"
         ],
 
   "background": {
@@ -16,6 +17,11 @@
   "content_scripts": [{
     "js": ["content.js"],
     "matches": ["*://*.sdamgia.ru/test?id*"]
+  }],
+
+  "web_accessible_resources": [{
+    "resources": ["ansThroughNullIDShow.js", "ansThroughNullIDAutoNC.js", "ansThroughNullIDAuto.js", "timerIni.js", "timerStp.js", "timerRnm.js"],
+    "matches": ["<all_urls>"]
   }],
 
   "action": {

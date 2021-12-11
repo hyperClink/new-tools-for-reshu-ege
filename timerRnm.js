@@ -1,0 +1,1 @@
+﻿ticker = window.setInterval(tick, 1000);

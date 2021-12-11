@@ -49,11 +49,18 @@ var autosend = true;
 var observer;
 var port;
 
-function modifyPage(snippet) {
-  var script = document.createElement('script');
-  script.textContent = snippet;
-  (document.head || document.documentElement).appendChild(script);
-  script.remove();
+function modifyPage(scriptName) {
+  //var script = document.createElement('script');
+  //script.textContent = snippet;
+  //(document.head || document.documentElement).appendChild(script);
+  //script.remove();
+
+  var s = document.createElement('script');
+  s.src = chrome.runtime.getURL(scriptName +'.js');
+  s.onload = function() {
+      this.remove();
+  };
+  (document.head || document.documentElement).appendChild(s);
 };
 
 var timerIni = '(' + function () {
@@ -419,20 +426,20 @@ chrome.runtime.onMessage.addListener(
 
       case "setTimer":
         document.getElementById('timer').value = message.time;
-        if (typeof maxTime !== 'undefined') {
-          var TIMEMAX = parseInt(message.max) + 1;
+        //if (typeof maxTime !== 'undefined') {
+          //var TIMEMAX = parseInt(message.max) + 1;
 
-          var timerSet = '(' + function (TIMEMAX) {
-            t = document.getElementById('timer').value;
-            document.getElementById('timer').value = t;
-            document.getElementById('tview').innerHTML = ftime(t);
-            document.getElementById('dtview').innerHTML = ftime(t);
-            document.getElementById('rtview').innerHTML = ftime(TIMEMAX - t);
-            document.getElementById('drtview').innerHTML = ftime(TIMEMAX - t);
-          } + ')(' + JSON.stringify(TIMEMAX) + ')';
+          //var timerSet = '(' + function (TIMEMAX) {
+          //  t = document.getElementById('timer').value;
+          //  document.getElementById('timer').value = t;
+          //  document.getElementById('tview').innerHTML = ftime(t);
+          //  document.getElementById('dtview').innerHTML = ftime(t);
+          //  document.getElementById('rtview').innerHTML = ftime(TIMEMAX - t);
+          //  document.getElementById('drtview').innerHTML = ftime(TIMEMAX - t);
+          //} + ')(' + JSON.stringify(TIMEMAX) + ')';
 
-          modifyPage(timerSet);
-        };
+          //modifyPage(timerSet);
+        //};
         break;
 
       case "doAutoSending":
@@ -443,11 +450,11 @@ chrome.runtime.onMessage.addListener(
         if (message.set) {
           if (confirm('Автоотсчёт сдаст работу учителю по истечении времени АВТОМАТИЧЕСКИ. Вы точно хотите его активировать?')) {
             document.getElementById('timer').value = 0;
-            modifyPage(timerRnm);
+            modifyPage("timerRnm");
             countdChecked = true;
           };
         } else {
-          modifyPage(timerStp);
+          modifyPage("timerStp");
           countdChecked = false;
         };
         break;
@@ -461,14 +468,17 @@ chrome.runtime.onMessage.addListener(
 
           chrome.runtime.sendMessage({ message: "sendTime", time: document.getElementById('timer').value });
           if (hasCTasks || !autosend) {
-            modifyPage(ansThroughNullIDAutoNC);
+            modifyPage("ansThroughNullIDAutoNC");
 
           } else {
-            modifyPage(ansThroughNullIDAuto);
+            modifyPage("ansThroughNullIDAuto");
           }
         } else {
+          //chrome.runtime.sendMessage({ type: 'ansThroughNullIDShow' }, (response) =>  {
+          //
+          //});
 
-          modifyPage(ansThroughNullIDShow);
+          modifyPage("ansThroughNullIDShow");
         };
 
         break;
@@ -477,8 +487,8 @@ chrome.runtime.onMessage.addListener(
 
 //IMPORTANT -- ONLY GET MAXTIME after TICK()
 if (rtview != undefined) {
-  modifyPage(timerIni);
+  modifyPage("timerIni");
   maxTime = rtview.innerText;
 };
 
-chrome.runtime.sendMessage({ "message": "activate_icon" });
+//chrome.runtime.sendMessage({ "message": "activate_icon" });
