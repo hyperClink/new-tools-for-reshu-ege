@@ -52,24 +52,24 @@ var port;
 function modifyPage(snippet) {
   var script = document.createElement('script');
   script.textContent = snippet;
-  (document.head||document.documentElement).appendChild(script);
+  (document.head || document.documentElement).appendChild(script);
   script.remove();
 };
 
-var timerIni = '(' + function() {
+var timerIni = '(' + function () {
   clearTimeout(window.ticker);
   window.tick();
 } + ')();';
 
-var timerRnm = '(' + function() {
-  ticker = window.setInterval(tick,1000);
+var timerRnm = '(' + function () {
+  ticker = window.setInterval(tick, 1000);
 } + ')();';
 
-var timerStp = '(' + function() {
+var timerStp = '(' + function () {
   clearTimeout(window.ticker);
 } + ')();';
 
-var ansThroughSaveShow = '(' + async function() {
+var ansThroughSaveShow = '(' + async function () {
   async function postData(url = '', t) {
     // Default options are marked with *
     const response = await fetch(url, {
@@ -84,6 +84,8 @@ var ansThroughSaveShow = '(' + async function() {
     return await response.text(); // parses JSON response into native JavaScript objects
   }
 
+
+
   var questionBodyIds = document.getElementsByClassName("test_inp");
 
   var parser = document.createElement('a');
@@ -92,7 +94,7 @@ var ansThroughSaveShow = '(' + async function() {
   for (var i = 0; i < questionBodyIds.length; i++) {
     item = questionBodyIds[i];
     var FD = new FormData;
-    if(item.name.indexOf("answer") > -1){
+    if (item.name.indexOf("answer") > -1) {
       FD.append('stat_id', questionBodyIds[1].value);
       FD.append('name', item.name.replace("c", ""));
       FD.append('answer[]', item.value);
@@ -103,7 +105,35 @@ var ansThroughSaveShow = '(' + async function() {
   window.open("https://" + parser.hostname + "/pupil?id=0&test=" + questionBodyIds[1].value);
 } + ')();';
 
-var ansThroughSaveAuto = '(' + async function() {
+var ansThroughNullIDShow = '(' + async function () {
+  var questionBodyIds = document.getElementsByClassName("test_inp");
+  var sols = document.getElementsByName('nosols');
+  var test_id = document.getElementsByName('test_id');
+  var stat_id = document.getElementsByName('stat_id');
+  if (stat_id[0] != undefined) {
+    stat_id[0].remove();
+  };
+
+  test_id[0].remove();
+  if (sols[0] !== undefined) {
+    sols[0].className = " ";
+  };
+
+  for (var i = 0; i < questionBodyIds.length; i++) {
+    item = questionBodyIds[i];
+    if (item.name.indexOf("answer") > -1) {
+      if (item.name.indexOf("answer_1_") > -1)
+        item.value = "это ответы, учителю ничего не направлено!"
+      item.name = item.name.replace("c", "")
+    }
+  }
+
+  $(document).ready(function(){
+    submit_form();
+  });
+} + ')();';
+
+var ansThroughSaveAuto = '(' + async function () {
   async function postData(url = '', t) {
     // Default options are marked with *
     const response = await fetch(url, {
@@ -126,7 +156,7 @@ var ansThroughSaveAuto = '(' + async function() {
   for (var i = 0; i < questionBodyIds.length; i++) {
     item = questionBodyIds[i];
     var FD = new FormData;
-    if(item.name.indexOf("answer") > -1){
+    if (item.name.indexOf("answer") > -1) {
       FD.append('stat_id', questionBodyIds[1].value);
       FD.append('name', item.name.replace("c", ""));
       FD.append('answer[]', item.value);
@@ -151,14 +181,76 @@ var ansThroughSaveAuto = '(' + async function() {
         z++;
       };
     };
-    $(document).ready(function(){
+    $(document).ready(function () {
       submit_form();
     });
 
   })
 } + ')();';
 
-var ansThroughSaveAutoNC = '(' + async function() {
+var ansThroughNullIDAuto = '(' + async function () {
+  async function postData(url = '', t) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *client
+      body: t // body data type must match "Content-Type" header
+    });
+    return await response.text(); // parses JSON response into native JavaScript objects
+  }
+
+  var questionBodyIds = document.getElementsByClassName("test_inp");
+
+  var parser = document.createElement('a');
+  parser.href = window.location.toString();
+
+  var FD = new FormData;
+  FD.append("a", "check");
+  FD.append("stat_id", "0");
+  FD.append("test_id", "");
+  FD.append("is_cr", "0");
+
+  for (var i = 0; i < questionBodyIds.length; i++) {
+    item = questionBodyIds[i];
+
+    if (item.name.indexOf("answer") > -1) {
+      //FD.append('stat_id', questionBodyIds[1].value);
+      //FD.append('name', item.name.replace("c", ""));
+      //FD.append('answer[]', item.value);
+      FD.append(item.name, '');
+      //await postData("https://" + parser.hostname + "/test", FD)
+    }
+  }
+
+  postData("https://" + parser.hostname + "/test", FD).then((tt) => {
+    var parser = new DOMParser();
+    var htmlDoc = parser.parseFromString(tt, 'text/html');
+
+    var answersParsed = [];
+    var answers = htmlDoc.getElementsByClassName("res_row");
+    for (var i = 0; i < answers.length; i++) {
+      answersParsed.push(answers[i].cells[4].innerText);
+    };
+
+    var z = 0;
+    for (var i = 0; i < questionBodyIds.length; i++) {
+      if (questionBodyIds[i].name.match(/answer/g) == "answer") {
+        questionBodyIds[i].value = answersParsed[z];
+        z++;
+      };
+    };
+    $(document).ready(function () {
+      submit_form();
+    });
+
+  })
+} + ')();';
+
+var ansThroughSaveAutoNC = '(' + async function () {
   async function postData(url = '', t) {
     // Default options are marked with *
     const response = await fetch(url, {
@@ -181,7 +273,7 @@ var ansThroughSaveAutoNC = '(' + async function() {
   for (var i = 0; i < questionBodyIds.length; i++) {
     item = questionBodyIds[i];
     var FD = new FormData;
-    if(item.name.indexOf("answer") > -1){
+    if (item.name.indexOf("answer") > -1) {
       FD.append('stat_id', questionBodyIds[1].value);
       FD.append('name', item.name.replace("c", ""));
       FD.append('answer[]', item.value);
@@ -196,7 +288,68 @@ var ansThroughSaveAutoNC = '(' + async function() {
     var answersParsed = [];
     var answers = htmlDoc.getElementsByClassName("res_row");
     for (var i = 0; i < answers.length; i++) {
-      if(answers[i].cells[2].innerText.indexOf("C") == -1){
+      if (answers[i].cells[2].innerText.indexOf("C") == -1) {
+        answersParsed.push(answers[i].cells[4].innerText);
+      }
+    };
+
+    var z = 0;
+    for (var i = 0; i < questionBodyIds.length; i++) {
+      if (questionBodyIds[i].name.match(/answer/g) == "answer" && questionBodyIds[i].name.indexOf("c") == -1) {
+        console.log(answersParsed[z]);
+        questionBodyIds[i].value = answersParsed[z];
+        z++;
+      };
+    };
+
+  })
+} + ')();';
+
+var ansThroughNullIDAutoNC = '(' + async function () {
+  async function postData(url = '', t) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *client
+      body: t // body data type must match "Content-Type" header
+    });
+    return await response.text(); // parses JSON response into native JavaScript objects
+  }
+
+  var questionBodyIds = document.getElementsByClassName("test_inp");
+
+  var parser = document.createElement('a');
+  parser.href = window.location.toString();
+
+  var FD = new FormData;
+  FD.append("a", "check");
+  FD.append("stat_id", "0");
+  FD.append("test_id", "");
+  FD.append("is_cr", "1");
+
+  for (var i = 0; i < questionBodyIds.length; i++) {
+    item = questionBodyIds[i];
+    if (item.name.indexOf("answer") > -1) {
+      //FD.append('stat_id', questionBodyIds[1].value);
+      //FD.append('name', item.name.replace("c", ""));
+      //FD.append('answer[]', item.value);
+      FD.append(item.name.replace("c", ""), '');
+      //await postData("https://" + parser.hostname + "/test?a=save_part&ajax=1", FD)
+    }
+  }
+
+  postData("https://" + parser.hostname + "/test", FD).then((tt) => {
+    var parser = new DOMParser();
+    var htmlDoc = parser.parseFromString(tt, 'text/html');
+
+    var answersParsed = [];
+    var answers = htmlDoc.getElementsByClassName("res_row");
+    for (var i = 0; i < answers.length; i++) {
+      if (answers[i].cells[2].innerText.indexOf("C") == -1) {
         answersParsed.push(answers[i].cells[4].innerText);
       }
     };
@@ -216,75 +369,75 @@ var ansThroughSaveAutoNC = '(' + async function() {
 var rtview = document.getElementById("rtview");
 
 chrome.runtime.onMessage.addListener(
-  function(message, sender, sendResponse) {
-    switch(message.type) {
+  function (message, sender, sendResponse) {
+    switch (message.type) {
 
       case "hasCTasks":
-          sendResponse({type:"hasCTasks", state:hasCTasks});
-      break;
+        sendResponse({ type: "hasCTasks", state: hasCTasks });
+        break;
 
       case "countdState":
-      if (typeof maxTime !== "undefined") {
-        sendResponse({type:"countdState", state: countdChecked, limit:true});
-        if (countdChecked) {
-          port = chrome.runtime.connect({name: "currTime"});
+        if (typeof maxTime !== "undefined") {
+          sendResponse({ type: "countdState", state: countdChecked, limit: true });
+          if (countdChecked) {
+            port = chrome.runtime.connect({ name: "currTime" });
 
-          port.onDisconnect.addListener(function(event) {
-            observer.disconnect();
-          });
-
-          observer = new MutationObserver(function(mutations){
-            mutations.forEach(function(mutation){
-              port.postMessage({time:document.getElementById('timer').value});
+            port.onDisconnect.addListener(function (event) {
+              observer.disconnect();
             });
-          });
 
-          var config = {characterData: false, attributes: false, childList: true, subtree: false};
-          observer.observe(rtview, config);
+            observer = new MutationObserver(function (mutations) {
+              mutations.forEach(function (mutation) {
+                port.postMessage({ time: document.getElementById('timer').value });
+              });
+            });
 
-          }else{
-          if (observer != undefined){
-            observer.disconnect();
+            var config = { characterData: false, attributes: false, childList: true, subtree: false };
+            observer.observe(rtview, config);
+
+          } else {
+            if (observer != undefined) {
+              observer.disconnect();
+            };
           };
+        } else {
+          sendResponse({ type: "countdState", state: true, limit: false });
         };
-      }else{
-        sendResponse({type:"countdState", state: true, limit:false});
-      };
-      break;
+        break;
 
       case "tmPos":
-          sendResponse({type:"tmPos", pos:document.getElementById('timer').value});
-      break;
+        sendResponse({ type: "tmPos", pos: document.getElementById('timer').value });
+        break;
 
       case "maxTime":
-      if (typeof maxTime !== 'undefined') {
-        sendResponse({type:"maxTime", max:maxTime});
-      }else{
-        sendResponse({type:"maxTime", max:"1:00:00"});
-      };
-      break;
+        if (typeof maxTime !== 'undefined') {
+          sendResponse({ type: "maxTime", max: maxTime });
+        } else {
+          sendResponse({ type: "maxTime", max: "1:00:00" });
+        };
+        break;
 
       case "setTimer":
         document.getElementById('timer').value = message.time;
         if (typeof maxTime !== 'undefined') {
-          var TIMEMAX = parseInt(message.max)+1;
+          var TIMEMAX = parseInt(message.max) + 1;
 
-          var timerSet = '(' + function(TIMEMAX) {
+          var timerSet = '(' + function (TIMEMAX) {
             t = document.getElementById('timer').value;
             document.getElementById('timer').value = t;
-            document.getElementById('tview').innerHTML=ftime(t);
-            document.getElementById('dtview').innerHTML=ftime(t);
-            document.getElementById('rtview').innerHTML=ftime(TIMEMAX-t);
-            document.getElementById('drtview').innerHTML=ftime(TIMEMAX-t);
+            document.getElementById('tview').innerHTML = ftime(t);
+            document.getElementById('dtview').innerHTML = ftime(t);
+            document.getElementById('rtview').innerHTML = ftime(TIMEMAX - t);
+            document.getElementById('drtview').innerHTML = ftime(TIMEMAX - t);
           } + ')(' + JSON.stringify(TIMEMAX) + ')';
 
           modifyPage(timerSet);
         };
-      break;
+        break;
 
       case "doAutoSending":
-        sendResponse({type:"doAutoSending", do:autosend});
-      break;
+        sendResponse({ type: "doAutoSending", do: autosend });
+        break;
 
       case "ticker":
         if (message.set) {
@@ -297,28 +450,28 @@ chrome.runtime.onMessage.addListener(
           modifyPage(timerStp);
           countdChecked = false;
         };
-      break;
+        break;
 
       case "autosend":
         autosend = message.set;
-      break;
+        break;
 
       case "hax":
-      if (message.auto) {
+        if (message.auto) {
 
-        chrome.runtime.sendMessage({message:"sendTime", time: document.getElementById('timer').value});
-        if(hasCTasks || !autosend){
-          modifyPage(ansThroughSaveAutoNC).then;
+          chrome.runtime.sendMessage({ message: "sendTime", time: document.getElementById('timer').value });
+          if (hasCTasks || !autosend) {
+            modifyPage(ansThroughNullIDAutoNC);
 
-        }else{
-          modifyPage(ansThroughSaveAuto);
-        }
-      }else{
+          } else {
+            modifyPage(ansThroughNullIDAuto);
+          }
+        } else {
 
-        modifyPage(ansThroughSaveShow);
-      };
+          modifyPage(ansThroughNullIDShow);
+        };
 
-      break;
+        break;
     };
   });
 
@@ -328,4 +481,4 @@ if (rtview != undefined) {
   maxTime = rtview.innerText;
 };
 
-chrome.runtime.sendMessage({"message": "activate_icon"});
+chrome.runtime.sendMessage({ "message": "activate_icon" });
