@@ -1,4 +1,4 @@
-chrome.runtime.onInstalled.addListener(function() {
+chrome.runtime.onInstalled.addListener(function () {
   chrome.action.disable();
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
@@ -6,7 +6,7 @@ chrome.runtime.onInstalled.addListener(function() {
     let exampleRule = {
       conditions: [
         new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {urlContains: 'sdamgia.ru/test?'}
+          pageUrl: { urlMatches: '(reshuege|sdamgia|reshuoge).ru/test?' }
         })
       ],
       actions: [new chrome.declarativeContent.ShowAction()],

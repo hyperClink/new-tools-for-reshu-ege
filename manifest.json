@@ -1,6 +1,6 @@
 {
   "name": "Инструменты и Ответы для Решу ЕГЭ",
-  "version": "2.2",
+  "version": "2.2.2",
   "description": "Показывает решения к вариантам Решу ЕГЭ/ОГЭ, позволяет заморозить таймер, выставить любое время.",
   "manifest_version": 3,
   "permissions": [
@@ -16,7 +16,9 @@
         "content.js"
       ],
       "matches": [
-        "*://*.sdamgia.ru/test?id*"
+        "*://*.sdamgia.ru/test?id*",
+        "*://*.reshuege.ru/test?id*",
+        "*://*.reshuoge.ru/test?id*"
       ]
     }
   ],
